@@ -9,6 +9,7 @@ from tkinter import colorchooser, messagebox, ttk
 
 from backend.renderer import render_html_to_image
 from backend.template_loader import load_templates
+from frontend.carousel import TemplateCarousel
 
 DESIGNS_DIR = Path(__file__).parent.parent / "mis diseños"
 DESIGNS_DIR.mkdir(exist_ok=True)
@@ -24,7 +25,7 @@ TEXT_MID   = "#bbbbbb"
 _INVALID_CHARS = r'\/:*?"<>|'
 
 
-# ── Dialogo de nombre de diseño ───────────────────────────────────────────────
+# ── Dialog: nombre del diseño ─────────────────────────────────────────────────
 
 class DesignNameDialog(tk.Toplevel):
     def __init__(self, parent: tk.Tk, default_name: str = ""):
@@ -37,11 +38,9 @@ class DesignNameDialog(tk.Toplevel):
         self.transient(parent)
         self.grab_set()
 
-        pw = parent.winfo_width()
-        ph = parent.winfo_height()
-        px = parent.winfo_rootx()
-        py = parent.winfo_rooty()
-        self.geometry(f"440x185+{px + pw // 2 - 220}+{py + ph // 2 - 92}")
+        pw, ph = parent.winfo_width(), parent.winfo_height()
+        px, py = parent.winfo_rootx(), parent.winfo_rooty()
+        self.geometry(f"440x185+{px + pw//2 - 220}+{py + ph//2 - 92}")
 
         tk.Label(self, text="Nombre del diseño:", bg=BG_DARK, fg=TEXT_MID,
                  font=("Segoe UI", 10, "bold")).pack(padx=28, pady=(22, 6), anchor="w")
@@ -52,17 +51,14 @@ class DesignNameDialog(tk.Toplevel):
                          relief=tk.FLAT, bd=0)
         entry.pack(padx=28, fill=tk.X, ipady=9, ipadx=10)
         tk.Frame(self, bg=ACCENT, height=1).pack(fill=tk.X, padx=28)
-
         tk.Label(self, text="Se creará una carpeta con este nombre en 'mis diseños/'",
-                 bg=BG_DARK, fg="#555", font=("Segoe UI", 8)).pack(padx=28, pady=(5, 0), anchor="w")
+                 bg=BG_DARK, fg="#444", font=("Segoe UI", 8)).pack(padx=28, pady=(5, 0), anchor="w")
 
         btn_row = tk.Frame(self, bg=BG_DARK)
         btn_row.pack(pady=16, padx=28, fill=tk.X)
-
         tk.Button(btn_row, text="Cancelar", bg="#252538", fg=TEXT_MID,
                   font=("Segoe UI", 10), relief=tk.FLAT, cursor="hand2", bd=0,
                   command=self.destroy).pack(side=tk.RIGHT, padx=(8, 0), ipadx=14, ipady=7)
-
         tk.Button(btn_row, text="Guardar", bg=ACCENT, fg=TEXT_MAIN,
                   font=("Segoe UI", 10, "bold"), relief=tk.FLAT, cursor="hand2", bd=0,
                   command=self._confirm).pack(side=tk.RIGHT, ipadx=20, ipady=7)
@@ -89,14 +85,14 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("HTML Image Generator")
-        self.geometry("1050x700")
-        self.minsize(800, 560)
+        self.geometry("1050x780")
+        self.minsize(700, 620)
         self.configure(bg=BG_DARK)
 
         self.templates = load_templates()
-        self.selected: dict | None = None
-        self.field_widgets: dict = {}
-        self.image_paths: dict = {}
+        self.selected:       dict | None = None
+        self.field_widgets:  dict = {}
+        self.image_paths:    dict = {}
 
         _configure_styles()
         self._build_ui()
@@ -104,57 +100,24 @@ class App(tk.Tk):
     # ── Layout ────────────────────────────────────────────────────────────────
 
     def _build_ui(self):
-        # Sidebar
-        sidebar = tk.Frame(self, bg=BG_SIDEBAR, width=235)
-        sidebar.pack(side=tk.LEFT, fill=tk.Y)
-        sidebar.pack_propagate(False)
-
-        header = tk.Frame(sidebar, bg=ACCENT, height=52)
-        header.pack(fill=tk.X)
-        header.pack_propagate(False)
-        tk.Label(header, text="Templates", bg=ACCENT, fg=TEXT_MAIN,
-                 font=("Segoe UI", 13, "bold")).pack(expand=True)
-
-        self.listbox = tk.Listbox(
-            sidebar, bg=BG_SIDEBAR, fg=TEXT_MID,
-            selectbackground=ACCENT, selectforeground=TEXT_MAIN,
-            font=("Segoe UI", 11), relief=tk.FLAT, bd=0,
-            activestyle="none", cursor="hand2",
+        # ── TOP: Coverflow carousel ──────────────────────────────────────────
+        self.carousel = TemplateCarousel(
+            self,
+            templates=self.templates,
+            on_select=self._on_template_selected,
+            bg=BG_DARK,
         )
-        self.listbox.pack(fill=tk.BOTH, expand=True, pady=6)
-        for t in self.templates:
-            self.listbox.insert(tk.END, f"  {t['name']}")
-        self.listbox.bind("<<ListboxSelect>>", self._on_select)
+        self.carousel.configure(height=300)
+        self.carousel.pack(fill=tk.X, side=tk.TOP)
 
-        # Área principal
-        main = tk.Frame(self, bg=BG_DARK)
-        main.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        tk.Frame(self, bg="#22223a", height=1).pack(fill=tk.X)
 
-        # Canvas con scroll
-        self.canvas = tk.Canvas(main, bg=BG_DARK, highlightthickness=0)
-        vscroll = ttk.Scrollbar(main, orient="vertical", command=self.canvas.yview)
-        self.scroll_frame = tk.Frame(self.canvas, bg=BG_DARK)
-
-        self.scroll_frame.bind(
-            "<Configure>",
-            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")),
-        )
-        self._cw = self.canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
-        self.canvas.configure(yscrollcommand=vscroll.set)
-        self.canvas.bind(
-            "<Configure>",
-            lambda e: self.canvas.itemconfig(self._cw, width=e.width),
-        )
-        self.canvas.bind_all("<MouseWheel>", lambda e: self.canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
-        self.canvas.bind_all("<Button-4>",   lambda e: self.canvas.yview_scroll(-1, "units"))
-        self.canvas.bind_all("<Button-5>",   lambda e: self.canvas.yview_scroll(1,  "units"))
-
-        # Barra inferior
-        bottom = tk.Frame(main, bg=BG_SIDEBAR, height=58)
+        # ── BOTTOM BAR ───────────────────────────────────────────────────────
+        bottom = tk.Frame(self, bg=BG_SIDEBAR, height=58)
         bottom.pack(side=tk.BOTTOM, fill=tk.X)
         bottom.pack_propagate(False)
 
-        self.status_var = tk.StringVar(value="Selecciona un template para comenzar")
+        self.status_var = tk.StringVar(value="")
         tk.Label(bottom, textvariable=self.status_var, bg=BG_SIDEBAR, fg=TEXT_DIM,
                  font=("Segoe UI", 9)).pack(side=tk.LEFT, padx=16)
 
@@ -164,11 +127,10 @@ class App(tk.Tk):
         tk.Label(fmt_row, text="Formato:", bg=BG_SIDEBAR, fg=TEXT_DIM,
                  font=("Segoe UI", 9)).pack(side=tk.LEFT, padx=4)
         for fmt in ("png", "jpg"):
-            tk.Radiobutton(
-                fmt_row, text=fmt.upper(), variable=self.fmt_var, value=fmt,
-                bg=BG_SIDEBAR, fg=TEXT_DIM, selectcolor=BG_SIDEBAR,
-                activebackground=BG_SIDEBAR, font=("Segoe UI", 9),
-            ).pack(side=tk.LEFT)
+            tk.Radiobutton(fmt_row, text=fmt.upper(), variable=self.fmt_var, value=fmt,
+                           bg=BG_SIDEBAR, fg=TEXT_DIM, selectcolor=BG_SIDEBAR,
+                           activebackground=BG_SIDEBAR, font=("Segoe UI", 9),
+                           ).pack(side=tk.LEFT)
 
         self.gen_btn = tk.Button(
             bottom, text="⚡  Generar Imagen",
@@ -179,50 +141,67 @@ class App(tk.Tk):
         )
         self.gen_btn.pack(side=tk.RIGHT, padx=16, pady=10)
 
+        # ── MIDDLE: Scrollable editor ─────────────────────────────────────────
+        editor_wrap = tk.Frame(self, bg=BG_DARK)
+        editor_wrap.pack(fill=tk.BOTH, expand=True)
+
+        self.canvas = tk.Canvas(editor_wrap, bg=BG_DARK, highlightthickness=0)
+        vscroll = ttk.Scrollbar(editor_wrap, orient="vertical", command=self.canvas.yview)
+        self.scroll_frame = tk.Frame(self.canvas, bg=BG_DARK)
+
+        self.scroll_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")),
+        )
+        self._cw = self.canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=vscroll.set)
+        self.canvas.bind("<Configure>",
+                         lambda e: self.canvas.itemconfig(self._cw, width=e.width))
+        self.canvas.bind_all("<MouseWheel>",
+                             lambda e: self.canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+        self.canvas.bind_all("<Button-4>", lambda e: self.canvas.yview_scroll(-1, "units"))
+        self.canvas.bind_all("<Button-5>", lambda e: self.canvas.yview_scroll( 1, "units"))
+
         vscroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
         self._show_placeholder()
 
-    # ── Eventos ───────────────────────────────────────────────────────────────
+    # ── Template selection ────────────────────────────────────────────────────
 
-    def _on_select(self, _event):
-        sel = self.listbox.curselection()
-        if not sel:
-            return
-        self.selected = self.templates[sel[0]]
+    def _on_template_selected(self, template: dict):
+        self.selected = template
         self._build_editor()
         self.gen_btn.config(state=tk.NORMAL)
+        self.status_var.set(f"Template: {template['name']}")
 
     # ── Editor ────────────────────────────────────────────────────────────────
 
     def _show_placeholder(self):
         for w in self.scroll_frame.winfo_children():
             w.destroy()
-        tk.Label(
-            self.scroll_frame,
-            text="← Selecciona un template para comenzar",
-            bg=BG_DARK, fg="#444", font=("Segoe UI", 14),
-        ).pack(expand=True, pady=120)
+        tk.Label(self.scroll_frame,
+                 text="Usa las flechas para elegir un template",
+                 bg=BG_DARK, fg="#333", font=("Segoe UI", 13),
+                 ).pack(expand=True, pady=80)
 
     def _build_editor(self):
         for w in self.scroll_frame.winfo_children():
             w.destroy()
         self.field_widgets = {}
-        self.image_paths = {}
+        self.image_paths   = {}
         self.canvas.yview_moveto(0)
 
         t   = self.selected
         pad = tk.Frame(self.scroll_frame, bg=BG_DARK)
-        pad.pack(fill=tk.BOTH, expand=True, padx=32, pady=28)
+        pad.pack(fill=tk.BOTH, expand=True, padx=36, pady=24)
 
         tk.Label(pad, text=t["name"], bg=BG_DARK, fg=TEXT_MAIN,
-                 font=("Segoe UI", 17, "bold")).pack(anchor="w")
-        tk.Label(pad, text=t.get("description", ""), bg=BG_DARK, fg=TEXT_DIM,
-                 font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 4))
-        tk.Label(pad, text=f"  {t.get('width','?')} × {t.get('height','?')} px",
-                 bg=BG_DARK, fg="#555", font=("Segoe UI", 8)).pack(anchor="w", pady=(0, 18))
-        tk.Frame(pad, bg="#2a2a40", height=1).pack(fill=tk.X, pady=(0, 18))
+                 font=("Segoe UI", 16, "bold")).pack(anchor="w")
+        size_desc = f"{t.get('description', '')}   •   {t.get('width','?')} × {t.get('height','?')} px"
+        tk.Label(pad, text=size_desc, bg=BG_DARK, fg=TEXT_DIM,
+                 font=("Segoe UI", 9)).pack(anchor="w", pady=(3, 0))
+        tk.Frame(pad, bg="#22223a", height=1).pack(fill=tk.X, pady=(14, 18))
 
         for field in t.get("fields", []):
             self._add_field(pad, field)
@@ -326,15 +305,12 @@ class App(tk.Tk):
                     values[fid] = f"data:image/{ext};base64,{b64}"
                 else:
                     values[fid] = field.get("default", "")
-
             elif ftype == "textarea":
                 w = self.field_widgets.get(fid)
                 values[fid] = w.get("1.0", tk.END).strip() if w else field.get("default", "")
-
             else:
                 w = self.field_widgets.get(fid)
                 values[fid] = w.get() if w else field.get("default", "")
-
         return values
 
     def _generate(self):
@@ -344,7 +320,6 @@ class App(tk.Tk):
             messagebox.showerror("Error", f"No se encontró template.html en:\n{t['_path']}")
             return
 
-        # Pedir nombre al usuario
         default_name = f"{t['name']} - {datetime.now().strftime('%d %b %Y')}"
         dialog = DesignNameDialog(self, default_name=default_name)
         if dialog.result is None:
@@ -362,7 +337,7 @@ class App(tk.Tk):
 
         def worker():
             try:
-                html   = html_path.read_text(encoding="utf-8")
+                html = html_path.read_text(encoding="utf-8")
                 render_html_to_image(html, values, save_path,
                                      t.get("width", 1200), t.get("height", 630))
                 self.after(0, lambda: self._done(save_path, design_folder))
@@ -388,11 +363,9 @@ class App(tk.Tk):
 def _configure_styles():
     style = ttk.Style()
     style.theme_use("default")
-    style.configure(
-        "Vertical.TScrollbar",
-        background=BG_SIDEBAR, troughcolor=BG_DARK,
-        bordercolor=BG_DARK, arrowcolor="#444", relief=tk.FLAT,
-    )
+    style.configure("Vertical.TScrollbar",
+                    background=BG_SIDEBAR, troughcolor=BG_DARK,
+                    bordercolor=BG_DARK, arrowcolor="#444", relief=tk.FLAT)
 
 
 def _valid_color(widget: tk.Widget, color: str) -> bool:
