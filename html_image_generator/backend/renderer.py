@@ -13,8 +13,7 @@ def render_html_to_image(
     height: int = 630,
 ):
     env = Environment(loader=BaseLoader(), autoescape=False)
-    tmpl = env.from_string(html_template)
-    rendered_html = tmpl.render(**values)
+    rendered_html = env.from_string(html_template).render(**values)
 
     with tempfile.NamedTemporaryFile(
         mode="w", suffix=".html", delete=False, encoding="utf-8"
@@ -29,15 +28,15 @@ def render_html_to_image(
             page.goto(Path(tmp_path).as_uri(), wait_until="networkidle")
 
             is_jpeg = output_path.lower().endswith((".jpg", ".jpeg"))
-            screenshot_args = {
+            kwargs = {
                 "path": output_path,
                 "clip": {"x": 0, "y": 0, "width": width, "height": height},
                 "type": "jpeg" if is_jpeg else "png",
             }
             if is_jpeg:
-                screenshot_args["quality"] = 92
+                kwargs["quality"] = 92
 
-            page.screenshot(**screenshot_args)
+            page.screenshot(**kwargs)
             browser.close()
     finally:
         os.unlink(tmp_path)
