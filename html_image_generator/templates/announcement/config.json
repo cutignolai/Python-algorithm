@@ -1,0 +1,18 @@
+{
+  "id": "announcement",
+  "name": "Anuncio / Evento",
+  "description": "Imagen 1200×628 px para eventos y Open Graph (og:image)",
+  "width": 1200,
+  "height": 628,
+  "fields": [
+    {"id": "event_name",     "label": "Nombre del evento",  "type": "text",     "default": "Gran Evento 2024"},
+    {"id": "date",           "label": "Fecha",               "type": "text",     "default": "15 de Marzo, 2024"},
+    {"id": "time",           "label": "Hora",                "type": "text",     "default": "19:00 hs"},
+    {"id": "location",       "label": "Lugar",               "type": "text",     "default": "Buenos Aires, Argentina"},
+    {"id": "description",    "label": "Descripción",         "type": "textarea", "default": "Únete a nosotros para este evento especial. Te esperamos con lo mejor."},
+    {"id": "cta_text",       "label": "Texto del botón CTA", "type": "text",     "default": "Regístrate Ahora"},
+    {"id": "bg_image",       "label": "Imagen de fondo",     "type": "image",    "default": ""},
+    {"id": "overlay_color",  "label": "Color del overlay",   "type": "color",    "default": "#0d0d2b"},
+    {"id": "accent_color",   "label": "Color de acento",     "type": "color",    "default": "#ff6b35"}
+  ]
+}

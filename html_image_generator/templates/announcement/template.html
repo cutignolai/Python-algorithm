@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1200px;
+    height: 628px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bg {
+    position: absolute;
+    inset: 0;
+    {% if bg_image %}
+    background: url('{{ bg_image }}') center / cover no-repeat;
+    {% else %}
+    background: linear-gradient(135deg, #0d0d2b 0%, #1c1c4a 55%, #0d0d2b 100%);
+    {% endif %}
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: {{ overlay_color }};
+    opacity: 0.84;
+  }
+
+  .grid-dots {
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    background-image: radial-gradient(circle, #ffffff 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+
+  .left-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 7px;
+    background: {{ accent_color }};
+  }
+
+  .deco-circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid {{ accent_color }};
+  }
+
+  .deco-c1 { width: 220px; height: 220px; right: 100px; top: 50%; transform: translateY(-50%); opacity: 0.2; }
+  .deco-c2 { width: 150px; height: 150px; right: 135px; top: 50%; transform: translateY(-50%); opacity: 0.35; }
+  .deco-c3 { width: 80px; height: 80px; right: 170px; top: 50%; transform: translateY(-50%); opacity: 0.55; }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 628px;
+    padding: 55px 80px 55px 88px;
+    max-width: 860px;
+    gap: 18px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    background: {{ accent_color }};
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    padding: 6px 16px;
+    border-radius: 4px;
+    align-self: flex-start;
+  }
+
+  .event-name {
+    font-size: 52px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.78);
+    font-size: 15px;
+  }
+
+  .meta-icon { color: {{ accent_color }}; font-size: 17px; }
+
+  .divider {
+    width: 56px;
+    height: 3px;
+    background: {{ accent_color }};
+    border-radius: 2px;
+  }
+
+  .description {
+    font-size: 17px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.65;
+    max-width: 680px;
+    white-space: pre-wrap;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: {{ accent_color }};
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 28px;
+    border-radius: 8px;
+    align-self: flex-start;
+    letter-spacing: 0.5px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="overlay"></div>
+  <div class="grid-dots"></div>
+  <div class="left-bar"></div>
+
+  <div class="deco-circle deco-c1"></div>
+  <div class="deco-circle deco-c2"></div>
+  <div class="deco-circle deco-c3"></div>
+
+  <div class="content">
+    <div class="tag">&#128197; Evento</div>
+    <div class="event-name">{{ event_name }}</div>
+
+    <div class="meta-row">
+      {% if date %}
+      <div class="meta-item">
+        <span class="meta-icon">&#128197;</span>
+        <span>{{ date }}</span>
+      </div>
+      {% endif %}
+      {% if time %}
+      <div class="meta-item">
+        <span class="meta-icon">&#128336;</span>
+        <span>{{ time }}</span>
+      </div>
+      {% endif %}
+      {% if location %}
+      <div class="meta-item">
+        <span class="meta-icon">&#128205;</span>
+        <span>{{ location }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="divider"></div>
+
+    {% if description %}
+    <div class="description">{{ description }}</div>
+    {% endif %}
+
+    {% if cta_text %}
+    <div class="cta">{{ cta_text }} &#8594;</div>
+    {% endif %}
+  </div>
+</body>
+</html>

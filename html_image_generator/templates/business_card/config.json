@@ -1,0 +1,18 @@
+{
+  "id": "business_card",
+  "name": "Tarjeta de Presentación",
+  "description": "Tarjeta profesional 1050×600 px",
+  "width": 1050,
+  "height": 600,
+  "fields": [
+    {"id": "name",         "label": "Nombre completo",   "type": "text",  "default": "Juan García"},
+    {"id": "title",        "label": "Cargo",              "type": "text",  "default": "Director de Marketing"},
+    {"id": "company",      "label": "Empresa",            "type": "text",  "default": "Acme Corporation"},
+    {"id": "email",        "label": "Email",              "type": "text",  "default": "juan@acme.com"},
+    {"id": "phone",        "label": "Teléfono",           "type": "text",  "default": "+54 9 11 1234-5678"},
+    {"id": "website",      "label": "Sitio web",          "type": "text",  "default": "www.acme.com"},
+    {"id": "avatar",       "label": "Foto de perfil",     "type": "image", "default": ""},
+    {"id": "bg_color",     "label": "Color de fondo",     "type": "color", "default": "#12121f"},
+    {"id": "accent_color", "label": "Color de acento",    "type": "color", "default": "#6c63ff"}
+  ]
+}
