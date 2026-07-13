@@ -1,0 +1,18 @@
+{
+  "id": "social_post",
+  "name": "Post para Redes Sociales",
+  "description": "Imagen cuadrada 1080×1080 px para Instagram, Facebook, etc.",
+  "width": 1080,
+  "height": 1080,
+  "fields": [
+    {"id": "title",        "label": "Título principal",   "type": "text",     "default": "Tu Mensaje Aquí"},
+    {"id": "subtitle",     "label": "Subtítulo",          "type": "text",     "default": "Una frase impactante"},
+    {"id": "body",         "label": "Cuerpo del texto",   "type": "textarea", "default": "Descripción o cuerpo del mensaje. Puede ser más largo y detallado."},
+    {"id": "hashtags",     "label": "Hashtags",           "type": "text",     "default": "#marketing #design #socialmedia"},
+    {"id": "username",     "label": "Usuario / Marca",    "type": "text",     "default": "@tumarca"},
+    {"id": "logo",         "label": "Logo",               "type": "image",    "default": ""},
+    {"id": "bg_color",     "label": "Color de fondo",     "type": "color",    "default": "#0f0f23"},
+    {"id": "accent_color", "label": "Color de acento",    "type": "color",    "default": "#e91e8c"},
+    {"id": "text_color",   "label": "Color de texto",     "type": "color",    "default": "#ffffff"}
+  ]
+}

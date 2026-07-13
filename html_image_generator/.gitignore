@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+mis\ diseños/*
+!mis\ diseños/.gitkeep

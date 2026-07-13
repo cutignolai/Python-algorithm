@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px;
+    height: 1080px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: {{ bg_color }};
+    color: {{ text_color }};
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bg-blob-1 {
+    position: absolute;
+    width: 650px;
+    height: 650px;
+    border-radius: 50%;
+    background: {{ accent_color }};
+    opacity: 0.07;
+    top: -220px;
+    right: -180px;
+    pointer-events: none;
+  }
+
+  .bg-blob-2 {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    background: {{ accent_color }};
+    opacity: 0.05;
+    bottom: -130px;
+    left: -100px;
+    pointer-events: none;
+  }
+
+  .corner { position: absolute; width: 44px; height: 44px; z-index: 1; }
+  .c-tl { top: 32px; left: 32px; border-top: 3px solid {{ accent_color }}; border-left: 3px solid {{ accent_color }}; }
+  .c-tr { top: 32px; right: 32px; border-top: 3px solid {{ accent_color }}; border-right: 3px solid {{ accent_color }}; }
+  .c-bl { bottom: 32px; left: 32px; border-bottom: 3px solid {{ accent_color }}; border-left: 3px solid {{ accent_color }}; }
+  .c-br { bottom: 32px; right: 32px; border-bottom: 3px solid {{ accent_color }}; border-right: 3px solid {{ accent_color }}; }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 90px 110px;
+    gap: 30px;
+    width: 100%;
+  }
+
+  .logo-wrap {
+    width: 90px;
+    height: 90px;
+    border-radius: 18px;
+    border: 2px solid {{ accent_color }};
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
+
+  .logo-placeholder {
+    width: 90px;
+    height: 90px;
+    border-radius: 18px;
+    border: 2px solid {{ accent_color }};
+    background: rgba(255,255,255,0.04);
+  }
+
+  .title {
+    font-size: 68px;
+    font-weight: 800;
+    color: {{ text_color }};
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .subtitle {
+    font-size: 26px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .divider {
+    width: 70px;
+    height: 4px;
+    background: {{ accent_color }};
+    border-radius: 2px;
+  }
+
+  .body {
+    font-size: 22px;
+    line-height: 1.65;
+    color: rgba(255,255,255,0.7);
+    max-width: 720px;
+    white-space: pre-wrap;
+  }
+
+  .hashtags {
+    font-size: 18px;
+    color: {{ accent_color }};
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 45px;
+    left: 60px;
+    right: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+  }
+
+  .username {
+    font-size: 17px;
+    color: rgba(255,255,255,0.4);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .accent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: {{ accent_color }};
+  }
+</style>
+</head>
+<body>
+  <div class="bg-blob-1"></div>
+  <div class="bg-blob-2"></div>
+
+  <div class="corner c-tl"></div>
+  <div class="corner c-tr"></div>
+  <div class="corner c-bl"></div>
+  <div class="corner c-br"></div>
+
+  <div class="content">
+    {% if logo %}
+    <div class="logo-wrap"><img src="{{ logo }}" /></div>
+    {% else %}
+    <div class="logo-placeholder"></div>
+    {% endif %}
+
+    <div class="title">{{ title }}</div>
+
+    {% if subtitle %}
+    <div class="subtitle">{{ subtitle }}</div>
+    {% endif %}
+
+    <div class="divider"></div>
+
+    {% if body %}
+    <div class="body">{{ body }}</div>
+    {% endif %}
+
+    {% if hashtags %}
+    <div class="hashtags">{{ hashtags }}</div>
+    {% endif %}
+  </div>
+
+  <div class="footer">
+    <span class="username">{{ username }}</span>
+    <div class="accent-dot"></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1050px;
+    height: 600px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: {{ bg_color }};
+    display: flex;
+    overflow: hidden;
+  }
+
+  .left {
+    width: 380px;
+    min-height: 600px;
+    background: {{ accent_color }};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    gap: 24px;
+    padding: 40px 30px;
+  }
+
+  .left::before {
+    content: '';
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    top: -130px;
+    left: -110px;
+  }
+
+  .left::after {
+    content: '';
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    bottom: -90px;
+    right: -80px;
+  }
+
+  .avatar-wrap { position: relative; z-index: 1; }
+
+  .avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.85);
+    object-fit: cover;
+    display: block;
+  }
+
+  .avatar-placeholder {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 72px;
+  }
+
+  .company {
+    position: relative;
+    z-index: 1;
+    color: rgba(255,255,255,0.92);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-align: center;
+  }
+
+  .right {
+    flex: 1;
+    background: {{ bg_color }};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 50px 55px;
+  }
+
+  .name {
+    font-size: 40px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  .job-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: {{ accent_color }};
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .divider {
+    width: 50px;
+    height: 3px;
+    background: {{ accent_color }};
+    border-radius: 2px;
+    margin-bottom: 28px;
+  }
+
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: rgba(255,255,255,0.68);
+    font-size: 15px;
+  }
+
+  .contact-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+    color: {{ accent_color }};
+  }
+</style>
+</head>
+<body>
+  <div class="left">
+    <div class="avatar-wrap">
+      {% if avatar %}
+      <img class="avatar" src="{{ avatar }}" />
+      {% else %}
+      <div class="avatar-placeholder">&#128100;</div>
+      {% endif %}
+    </div>
+    <div class="company">{{ company }}</div>
+  </div>
+
+  <div class="right">
+    <div class="name">{{ name }}</div>
+    <div class="job-title">{{ title }}</div>
+    <div class="divider"></div>
+    <div class="contact-list">
+      {% if email %}
+      <div class="contact-item">
+        <div class="contact-icon">&#9993;</div>
+        <span>{{ email }}</span>
+      </div>
+      {% endif %}
+      {% if phone %}
+      <div class="contact-item">
+        <div class="contact-icon">&#9742;</div>
+        <span>{{ phone }}</span>
+      </div>
+      {% endif %}
+      {% if website %}
+      <div class="contact-item">
+        <div class="contact-icon">&#127760;</div>
+        <span>{{ website }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>
